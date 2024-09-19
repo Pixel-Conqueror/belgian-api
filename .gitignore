@@ -1,3 +1,24 @@
-.env
+# Dependencies and AdonisJS build
 node_modules
-mongo-keyfile
+build
+tmp
+
+# Secrets
+.env
+.env.local
+.env.production.local
+.env.development.local
+
+# Frontend assets compiled code
+public/assets
+
+# Build tools specific
+npm-debug.log
+yarn-error.log
+
+# Editors specific
+.fleet
+.idea
+
+# Platform specific
+.DS_Store

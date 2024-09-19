@@ -1,0 +1,65 @@
+name: dev-stack
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:16
+    restart: always
+    environment:
+      - POSTGRES_DB=${DB_DATABASE}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready']
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+    ports:
+      - '${DB_PORT}:5432'
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4:8.6
+    restart: always
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=myemail@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=a12345678
+    depends_on:
+      - postgres
+    volumes:
+      - ./servers_pgadmin.json:/pgadmin4/servers.json
+    ports:
+      - '5050:80'
+
+  mongo:
+    container_name: mongo
+    image: mongo:7.0
+    restart: always
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    command: ['--replSet', 'rs0', '--bind_ip_all', '--port', '27017']
+    healthcheck:
+      test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'host.docker.internal:27017'}]}) }" | mongosh --port 27017 --quiet
+      interval: 2s
+      timeout: 30s
+      start_period: 0s
+      start_interval: 1s
+      retries: 50
+    ports:
+      - 27017:27017
+
+  mongo-express:
+    container_name: mongo-express
+    image: mongo-express:1.0
+    restart: always
+    ports:
+      - 8082:8081
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_BASICAUTH=false
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+volumes:
+  mongo-data:
+  mongo-config:
+  postgres_volume:
