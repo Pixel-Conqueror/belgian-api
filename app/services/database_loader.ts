@@ -1,5 +1,3 @@
-// app/services/DatabaseLoader.ts
-
 import {
   Activity,
   Address,
