@@ -330,7 +330,7 @@ export class DatabaseLoader {
       naceCode: row['NaceCode'],
       description: row['description'],
       classification: row['Classification'],
-      uniqueKey: `${row['EntityNumber']}-${row['NaceVersion']}-${'NaceCode'}`,
+      uniqueKey: `${row['EntityNumber']}-${row['NaceVersion']}-${row['NaceCode']}`,
     }));
 
     try {
@@ -478,7 +478,7 @@ export class DatabaseLoader {
         naceCode: row['NaceCode'],
         description: row['description'],
         classification: row['Classification'],
-        uniqueKey: `${row['EntityNumber']}-${row['NaceVersion']}-${'NaceCode'}`,
+        uniqueKey: `${row['EntityNumber']}-${row['NaceVersion']}-${row['NaceCode']}`,
       };
 
       try {
