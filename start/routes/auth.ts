@@ -4,6 +4,7 @@ import router from '@adonisjs/core/services/router';
 
 const LoginController = () => import('#controllers/login_controller');
 const SigninsController = () => import('#controllers/signins_controller');
+const LogoutsController = () => import('#controllers/logouts_controller');
 
 router
   .group(() => {
@@ -11,9 +12,12 @@ router
       .group(() => {
         router.post('login', [LoginController, 'handle']);
         router.post('signin', [SigninsController, 'handle']);
-        router.post('verify_token', [LoginController, 'verifyToken']);
       })
-      .prefix('/auth')
       .middleware(middleware.guest());
+
+    router
+      .post('logout', [LogoutsController, 'handle'])
+      .middleware(middleware.auth());
   })
+  .prefix('/auth')
   .prefix(API_PREFIX_V1);

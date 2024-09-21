@@ -18,7 +18,8 @@ export default class LoginController {
     token.identifier;
     return {
       message: 'Login successful',
-      token,
+      token: token.toJSON(),
+      user: user.serialize(),
     };
   }
 }
