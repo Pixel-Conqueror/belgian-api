@@ -1,3 +1,4 @@
+name: dev-stack
 services:
   postgres:
     container_name: postgres
@@ -8,10 +9,7 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER}']
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      test: ['CMD-SHELL', 'pg_isready']
     volumes:
       - postgres_volume:/var/lib/postgresql/data
     ports:
@@ -32,74 +30,28 @@ services:
       - '5050:80'
 
   mongo:
+    container_name: mongo
     image: mongo:7.0
-    container_name: mongodb
-    command:
-      [
-        '--replSet',
-        'rs0',
-        '--bind_ip_all',
-        '--port',
-        '27017',
-        '--keyFile',
-        '/etc/secrets/mongo-keyfile',
-      ]
-    ports:
-      - '27017:27017'
+    restart: always
     extra_hosts:
       - 'host.docker.internal:host-gateway'
+    command: ['--replSet', 'rs0', '--bind_ip_all', '--port', '27017']
     healthcheck:
-      test:
-        [
-          'CMD-SHELL',
-          "echo 'rs.status().ok || rs.initiate()' | mongosh --quiet",
-        ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-    volumes:
-      - mongo-data:/data/db
-      - mongo-config:/data/configdb
-      - ./mongo-keyfile:/etc/secrets/mongo-keyfile:ro
-
-  mongo_setup:
-    image: mongo:7.0
-    container_name: mongo_setup
-    depends_on:
-      - mongo
-    entrypoint: >
-      bash -c "
-      sleep 5;
-      echo 'Waiting for MongoDB to be ready...';
-      until mongosh --host mongodb --port 27017 -u ${MONGO_INITDB_ROOT_USERNAME} -p ${MONGO_INITDB_ROOT_PASSWORD} --authenticationDatabase admin --eval 'print(\"MongoDB is ready\")'; do
-        sleep 2;
-      done;
-      echo 'MongoDB is ready';
-
-      # Vérifier si le Replica Set est déjà initialisé
-      RS_STATUS=\$(mongosh --quiet --host mongodb --port 27017 -u ${MONGO_INITDB_ROOT_USERNAME} -p ${MONGO_INITDB_ROOT_PASSWORD} --authenticationDatabase admin --eval 'rs.status().ok');
-      if [ \"\$RS_STATUS\" != \"1\" ]; then
-        echo 'Initiating replica set...';
-        mongosh --quiet --host mongodb --port 27017 -u ${MONGO_INITDB_ROOT_USERNAME} -p ${MONGO_INITDB_ROOT_PASSWORD} --authenticationDatabase admin --eval 'rs.initiate({_id: \"rs0\", members: [{ _id: 0, host: \"mongodb:27017\" }]})';
-      else
-        echo 'Replica set already initialized';
-      fi
-      "
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-    networks:
-      - default
+      test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'host.docker.internal:27017'}]}) }" | mongosh --port 27017 --quiet
+      interval: 2s
+      timeout: 30s
+      start_period: 0s
+      start_interval: 1s
+      retries: 50
+    ports:
+      - 27017:27017
 
   mongo-express:
     container_name: mongo-express
     image: mongo-express:1.0
     restart: always
     ports:
-      - '8082:8081'
+      - 8082:8081
     environment:
       - ME_CONFIG_MONGODB_SERVER=mongo
       - ME_CONFIG_BASICAUTH=false

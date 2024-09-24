@@ -18,6 +18,8 @@ model Activity {
   uniqueKey      String @unique @map("UniqueKey")
 
   enterprise Enterprise? @relation(fields: [entityNumber], references: [enterpriseNumber])
+
+  @@index([entityNumber])
 }
 
 model Address {
@@ -32,6 +34,8 @@ model Address {
   uniqueKey        String  @unique @map("UniqueKey")
 
   enterprise Enterprise? @relation(fields: [entityNumber], references: [enterpriseNumber])
+
+  @@index([entityNumber])
 }
 
 model Branch {
@@ -42,6 +46,8 @@ model Branch {
   uniqueKey        String   @unique @map("UniqueKey")
 
   enterprise Enterprise @relation(fields: [enterpriseNumber], references: [enterpriseNumber])
+
+  @@index([enterpriseNumber])
 }
 
 model Contact {
@@ -53,6 +59,8 @@ model Contact {
   uniqueKey     String @unique @map("UniqueKey")
 
   enterprise Enterprise? @relation(fields: [entityNumber], references: [enterpriseNumber])
+
+  @@index([entityNumber])
 }
 
 model Denomination {
@@ -63,6 +71,8 @@ model Denomination {
   uniqueKey          String @unique @map("UniqueKey")
 
   enterprise Enterprise? @relation(fields: [entityNumber], references: [enterpriseNumber])
+
+  @@index([entityNumber])
 }
 
 model Enterprise {
@@ -87,7 +97,9 @@ model Establishment {
   establishmentNumber String   @map("EstablishmentNumber")
   startDate           DateTime @map("StartDate")
   enterpriseNumber    String   @map("EnterpriseNumber")
-  uniqueKey           String   @map("UniqueKey")
+  uniqueKey           String   @unique @map("UniqueKey")
 
   enterprise Enterprise @relation(fields: [enterpriseNumber], references: [enterpriseNumber])
+
+  @@index([enterpriseNumber])
 }
