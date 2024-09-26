@@ -87,7 +87,7 @@ export class DatabaseLoader {
   public async run() {
     try {
       const codeMappings = await this.loadCodeMappings(
-        path.join(this.CSV_DIR, 'cleaned-codes.csv')
+        path.join(import.meta.dirname, 'csvs/cleaned-codes.csv')
       );
 
       const processingPromises = [];
@@ -99,7 +99,6 @@ export class DatabaseLoader {
 
           const fileLength = await this.getFileLength(filePath);
 
-          // Ajoutez la promesse de traitement au tableau
           processingPromises.push(
             this.processFileInWorker(
               filePath,
@@ -115,7 +114,6 @@ export class DatabaseLoader {
         }
       }
 
-      // Exécuter toutes les promesses en parallèle
       await Promise.all(processingPromises);
 
       console.log('All files processed successfully.');
