@@ -7,4 +7,4 @@ const ScrappingController = () => import('#controllers/scrapping_controller');
 router
   .get('/scrapping/:Number', [ScrappingController, 'index'])
   .prefix(API_PREFIX_V1)
-//   .middleware(middleware.auth());
+  .middleware(middleware.auth());
