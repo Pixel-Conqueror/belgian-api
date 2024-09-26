@@ -3,11 +3,14 @@ import '#routes/auth';
 import '#routes/swagger';
 import '#routes/welcome';
 import '#routes/upload_csv';
+import '#routes/scrapping'
+
 import '#routes/enterprise';
 import { middleware } from '#start/kernel';
 import router from '@adonisjs/core/services/router';
 
 const UserController = () => import('#controllers/user_controller');
+
 
 router
   .get('/user', [UserController, 'index'])
