@@ -7,14 +7,27 @@ import queue from '@rlanz/bull-queue/services/main';
 
 export default class UploadController {
   async handle({ request, auth }: HttpContext) {
-    const { file } = await request.validateUsing(uploadFileValidator);
-    const folderName = cuid();
-    const folderPath = `${app.tmpPath('temp_csv')}/${folderName}`;
-    await file.move(folderPath);
+    const { file, fileName } = await request.validateUsing(uploadFileValidator);
+
+    const folderPath = this.generateFolderPath();
+    await file.move(folderPath, { name: this.generateFileName(fileName) });
+
     await queue.dispatch(ProcessCsvFileUploadedJob, {
       folderPath,
       userId: auth.user!.id,
     });
     return { message: 'File uploaded successfully' };
+  }
+
+  private generateFileName(fileName: string) {
+    if (fileName.endsWith('.csv')) {
+      return fileName;
+    }
+
+    return `${fileName}.csv`;
+  }
+
+  private generateFolderPath() {
+    return `${app.tmpPath('temp_csv')}/${cuid()}`;
   }
 }

@@ -1,4 +1,5 @@
 import vine from '@vinejs/vine';
+import { FileNames } from '#validators/enum/file_names';
 
 export const uploadFileValidator = vine.compile(
   vine.object({
@@ -6,5 +7,6 @@ export const uploadFileValidator = vine.compile(
       size: '1gb',
       extnames: ['csv'],
     }),
+    fileName: vine.enum(FileNames),
   })
 );
