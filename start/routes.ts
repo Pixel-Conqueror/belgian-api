@@ -1,7 +1,6 @@
 import { API_PREFIX_V1 } from '#constants/api_version';
 import '#routes/auth';
 import '#routes/enterprise';
-import '#routes/scrapping';
 import '#routes/swagger';
 import '#routes/upload_csv';
 import '#routes/welcome';
