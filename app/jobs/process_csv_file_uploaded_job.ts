@@ -1,26 +1,23 @@
 import User from '#models/user';
+import { DatabaseLoader } from '#services/database_loader';
 import { Job } from '@rlanz/bull-queue';
 
 interface ProcessCsvFileUploadedJobPayload {
   userId: User['id'];
-  fileName: string;
+  folderPath: string;
 }
 
 export default class ProcessCsvFileUploadedJob extends Job {
-  // This is the path to the file that is used to create the job
   static get $$filepath() {
     return import.meta.url;
   }
 
-  /**
-   * Base Entry point
-   */
   async handle(payload: ProcessCsvFileUploadedJobPayload) {
-    console.log('job', payload);
+    const parser = new DatabaseLoader(payload.folderPath);
+    await parser.run();
   }
 
-  /**
-   * This is an optional method that gets called when the retries has exceeded and is marked failed.
-   */
-  async rescue(payload: ProcessCsvFileUploadedJobPayload) {}
+  async rescue(payload: ProcessCsvFileUploadedJobPayload) {
+    console.error('Abort job', payload);
+  }
 }

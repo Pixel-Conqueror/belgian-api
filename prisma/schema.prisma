@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,4 +5,101 @@ generator client {
 datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
+}
+
+model Activity {
+  id             String @id @default(auto()) @map("_id") @db.ObjectId
+  entityNumber   String @map("EntityNumber")
+  activityGroup  String @map("ActivityGroup")
+  naceVersion    String @map("NaceVersion")
+  naceCode       String @map("NaceCode")
+  description    String @map("Description")
+  classification String @map("Classification")
+  uniqueKey      String @unique @map("UniqueKey")
+
+  enterprise Enterprise? @relation(fields: [entityNumber], references: [enterpriseNumber])
+
+  @@index([entityNumber])
+}
+
+model Address {
+  id               String  @id @default(auto()) @map("_id") @db.ObjectId
+  entityNumber     String  @map("EntityNumber")
+  typeOfAddress    String  @map("TypeOfAddress")
+  zipcode          String  @map("Zipcode")
+  municipalityFR   String  @map("MunicipalityFR")
+  streetFR         String  @map("StreetFR")
+  houseNumber      String  @map("HouseNumber")
+  extraAddressInfo String? @map("ExtraAddressInfo")
+  uniqueKey        String  @unique @map("UniqueKey")
+
+  enterprise Enterprise? @relation(fields: [entityNumber], references: [enterpriseNumber])
+
+  @@index([entityNumber])
+}
+
+model Branch {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  branchId         String   @map("BranchId")
+  startDate        DateTime @map("StartDate")
+  enterpriseNumber String   @map("EnterpriseNumber")
+  uniqueKey        String   @unique @map("UniqueKey")
+
+  enterprise Enterprise @relation(fields: [enterpriseNumber], references: [enterpriseNumber])
+
+  @@index([enterpriseNumber])
+}
+
+model Contact {
+  id            String @id @default(auto()) @map("_id") @db.ObjectId
+  entityNumber  String @map("EntityNumber")
+  entityContact String @map("EntityContact")
+  contactType   String @map("ContactType")
+  value         String @map("Value")
+  uniqueKey     String @unique @map("UniqueKey")
+
+  enterprise Enterprise? @relation(fields: [entityNumber], references: [enterpriseNumber])
+
+  @@index([entityNumber])
+}
+
+model Denomination {
+  id                 String @id @default(auto()) @map("_id") @db.ObjectId
+  entityNumber       String @map("EntityNumber")
+  typeOfDenomination String @map("TypeOfDenomination")
+  denomination       String @map("Denomination")
+  uniqueKey          String @unique @map("UniqueKey")
+
+  enterprise Enterprise? @relation(fields: [entityNumber], references: [enterpriseNumber])
+
+  @@index([entityNumber])
+}
+
+model Enterprise {
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  enterpriseNumber   String   @unique @map("EnterpriseNumber")
+  status             String   @map("Status")
+  juridicalSituation String   @map("JuridicalSituation")
+  typeOfEnterprise   String   @map("TypeOfEnterprise")
+  juridicalForm      String   @map("JuridicalForm")
+  startDate          DateTime @map("StartDate")
+
+  activities     Activity[]
+  addresses      Address[]
+  branches       Branch[]
+  contacts       Contact[]
+  denominations  Denomination[]
+  establishments Establishment[]
+}
+
+model Establishment {
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  establishmentNumber String   @map("EstablishmentNumber")
+  startDate           DateTime @map("StartDate")
+  enterpriseNumber    String   @map("EnterpriseNumber")
+  uniqueKey           String   @unique @map("UniqueKey")
+
+  enterprise Enterprise @relation(fields: [enterpriseNumber], references: [enterpriseNumber])
+
+  @@index([enterpriseNumber])
 }

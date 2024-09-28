@@ -3,6 +3,7 @@ import '#routes/auth';
 import '#routes/swagger';
 import '#routes/welcome';
 import '#routes/upload_csv';
+import '#routes/enterprise';
 import { middleware } from '#start/kernel';
 import router from '@adonisjs/core/services/router';
 
