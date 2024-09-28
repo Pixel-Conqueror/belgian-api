@@ -1,6 +1,10 @@
 import path from 'node:path';
 import url from 'node:url';
-import packageJson from '../package.json' with { type: 'json' };
+
+// Ugly workaround to import package.json without experiemental TS warning
+// Source : https://github.com/nodejs/node/issues/51347#issuecomment-2111337854
+import { createRequire } from 'node:module';
+const packageJson = createRequire(import.meta.url)('../package.json');
 
 export default {
   path: path.dirname(url.fileURLToPath(import.meta.url)) + '/../', //
