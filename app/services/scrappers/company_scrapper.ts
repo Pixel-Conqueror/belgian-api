@@ -1,9 +1,9 @@
+import BaseScrapperService from '#services/scrappers/base_scrapper';
 import { CheerioAPI } from 'cheerio';
-import BaseScrapper from './base_scrapper.js';
 
 const COMPANY_BASE_URL = 'https://www.companyweb.be/fr/';
 
-export default class CompanyScrapperController extends BaseScrapper {
+export default class CompanyScrapperService extends BaseScrapperService {
   baseUrl: string = COMPANY_BASE_URL;
 
   async getDataFromEnterpriseNumber(enterpriseId: string) {

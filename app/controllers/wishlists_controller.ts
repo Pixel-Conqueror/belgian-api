@@ -1,8 +1,11 @@
-import ScrapperController from '#controllers/scrappers/scrapper_controller';
+import ScrapperController from '#controllers/scrapper_controller';
+import User from '#models/user';
 import db from '#services/db';
 import { wishlistValidator } from '#validators/wishlist_validator';
 import { inject } from '@adonisjs/core';
 import type { HttpContext } from '@adonisjs/core/http';
+
+type UserId = User['id'] | string;
 
 @inject()
 export default class WishlistsController {
@@ -10,20 +13,12 @@ export default class WishlistsController {
 
   /**
    * @index
-   * @description Display a list of wishlists
+   * @description Display a list of wishlists for the authenticated user
    * @responseBody 200 - <Wishlist[]>
    * @responseHeader 200
    */
   async index({ auth }: HttpContext) {
-    const wishlists = await db.wishlist.findMany({
-      where: {
-        userId: auth.user!.id.toString(),
-      },
-      include: {
-        scrappedDatas: true,
-      },
-    });
-
+    const wishlists = await this.findWishlistsByUserId(auth.user!.id);
     return wishlists;
   }
 
@@ -40,42 +35,13 @@ export default class WishlistsController {
     } = await request.validateUsing(wishlistValidator);
     const userId = auth.user!.id.toString();
 
-    const existingWishlist = await db.wishlist.findUnique({
-      where: {
-        id: '',
-        enterpriseId,
-        userId,
-      },
-    });
-
-    if (existingWishlist) {
-      throw new Error('This enterprise is already in your wishlist.');
-    }
-
-    await db.wishlist.create({
-      data: {
-        userId,
-        enterpriseId,
-      },
-    });
-
+    const wishlist = await this.createWishlist(userId, enterpriseId);
     const scrappedData =
       await this.scrapperController.getEnterpriseData(enterpriseId);
 
-    if (scrappedData) {
-      const existingScrapperData = await db.scrappedData.findUnique({
-        where: { enterpriseId },
-      });
-
-      if (!existingScrapperData) {
-        await db.scrappedData.create({
-          data: scrappedData,
-        });
-      }
-    }
-
     return {
       scrappedData,
+      wishlist,
     };
   }
 
@@ -101,5 +67,39 @@ export default class WishlistsController {
     }
 
     return scrappedData;
+  }
+
+  private async createWishlist(userId: UserId, enterpriseId: string) {
+    const existingWishlist = await this.findWishlistByEnterpriseId(
+      enterpriseId,
+      userId
+    );
+    if (existingWishlist.length > 0) {
+      throw new Error('This enterprise is already in your wishlist.');
+    }
+
+    return db.wishlist.create({
+      data: {
+        userId: userId.toString(),
+        enterpriseId,
+      },
+    });
+  }
+
+  private findWishlistsByUserId(userId: UserId) {
+    return db.wishlist.findMany({
+      where: {
+        userId: userId.toString(),
+      },
+    });
+  }
+
+  private findWishlistByEnterpriseId(enterpriseId: string, userId: UserId) {
+    return db.wishlist.findMany({
+      where: {
+        enterpriseId,
+        userId: userId.toString(),
+      },
+    });
   }
 }

@@ -1,12 +1,13 @@
-import CompanyScrapperController from '#controllers/scrappers/company_scrapper_controller';
-import KboScrapperController from '#controllers/scrappers/kbo_scrapper_controller';
+import db from '#services/db';
+import CompanyScrapperController from '#services/scrappers/company_scrapper';
+import KboScrapperController from '#services/scrappers/kbo_scrapper';
 import { scrappingValidator } from '#validators/scrapping_validator';
 import { inject } from '@adonisjs/core';
 import type { HttpContext } from '@adonisjs/core/http';
-import { ScrapperData } from '@prisma/client';
+import { ScrappedData } from '@prisma/client';
 
 type ScrapperResultData = Record<string, string | undefined>;
-type ScrapperResult = ScrapperData;
+type ScrapperResult = ScrappedData;
 
 @inject()
 export default class ScrapperController {
@@ -32,12 +33,36 @@ export default class ScrapperController {
   public async getEnterpriseData(
     enterpriseId: string
   ): Promise<ScrapperResult> {
+    const existingScrappedData =
+      await this.findScrappedDataByEnterpriseId(enterpriseId);
+
+    if (existingScrappedData) {
+      return existingScrappedData;
+    }
+
+    return await this.scrapEnterpriseData(enterpriseId);
+  }
+
+  public async scrapEnterpriseData(
+    enterpriseId: string
+  ): Promise<ScrapperResult> {
     const datas = await Promise.all([
       this.companyScrapperController.getDataFromEnterpriseNumber(enterpriseId),
       this.kboScrapperController.getDataFromEnterpriseNumber(enterpriseId),
     ]);
+    const scrappedData = this.deepMergeResults(...datas);
+    await db.scrappedData.create({
+      data: scrappedData,
+    });
+    return scrappedData;
+  }
 
-    return this.deepMergeResults(...datas);
+  public findScrappedDataByEnterpriseId(
+    enterpriseId: string
+  ): Promise<ScrapperResult | null> {
+    return db.scrappedData.findUnique({
+      where: { enterpriseId },
+    });
   }
 
   private deepMergeResults(...objects: ScrapperResultData[]): ScrapperResult {
