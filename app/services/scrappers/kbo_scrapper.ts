@@ -4,7 +4,7 @@ import BaseScrapper from './base_scrapper.js';
 const KBO_BASE_URL =
   'https://kbopub.economie.fgov.be/kbopub/toonondernemingps.html?lang=fr&ondernemingsnummer=';
 
-export default class KboScrapperController extends BaseScrapper {
+export default class KboScrapperService extends BaseScrapper {
   baseUrl: string = KBO_BASE_URL;
 
   async getDataFromEnterpriseNumber(enterpriseId: string) {
