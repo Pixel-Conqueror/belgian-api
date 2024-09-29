@@ -7,7 +7,7 @@ const ScrapperController = () =>
 
 router
   .group(() => {
-    router.get('/scrapper/:companyNumber', [ScrapperController, 'index']);
+    router.get('/scrapper/:enterpriseId', [ScrapperController, 'index']);
   })
   .prefix(API_PREFIX_V1)
   .middleware(middleware.auth());

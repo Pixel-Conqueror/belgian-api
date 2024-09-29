@@ -3,8 +3,10 @@ import KboScrapperController from '#controllers/scrappers/kbo_scrapper_controlle
 import { scrappingValidator } from '#validators/scrapping_validator';
 import { inject } from '@adonisjs/core';
 import type { HttpContext } from '@adonisjs/core/http';
+import { ScrapperData } from '@prisma/client';
 
-type ScrapperResult = Record<string, string | undefined>;
+type ScrapperResultData = Record<string, string | undefined>;
+type ScrapperResult = ScrapperData;
 
 @inject()
 export default class ScrapperController {
@@ -15,26 +17,30 @@ export default class ScrapperController {
 
   /**
    * @index
-   * @description Get data from enterprise number
-   * @paramPath companyNumber - Company number
+   * @description Get data from enterprise id
+   * @paramPath enterpriseId - Enterprise id
    * @responseBody 200 - <ScrapperResult>
    * @responseHeader 200
    */
   public async index({ request }: HttpContext) {
     const {
-      params: { companyNumber },
+      params: { enterpriseId },
     } = await request.validateUsing(scrappingValidator);
-
-    const datas = await Promise.all([
-      this.companyScrapperController.getDataFromEnterpriseNumber(companyNumber),
-      this.kboScrapperController.getDataFromEnterpriseNumber(companyNumber),
-    ]);
-
-    const mergedResults = this.deepMergeResults(...datas);
-    return { data: mergedResults };
+    return this.getEnterpriseData(enterpriseId);
   }
 
-  private deepMergeResults(...objects: ScrapperResult[]): ScrapperResult {
+  public async getEnterpriseData(
+    enterpriseId: string
+  ): Promise<ScrapperResult> {
+    const datas = await Promise.all([
+      this.companyScrapperController.getDataFromEnterpriseNumber(enterpriseId),
+      this.kboScrapperController.getDataFromEnterpriseNumber(enterpriseId),
+    ]);
+
+    return this.deepMergeResults(...datas);
+  }
+
+  private deepMergeResults(...objects: ScrapperResultData[]): ScrapperResult {
     const deepCopyObjects = objects.map((object) =>
       JSON.parse(JSON.stringify(object))
     );

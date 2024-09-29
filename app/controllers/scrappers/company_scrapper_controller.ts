@@ -6,10 +6,10 @@ const COMPANY_BASE_URL = 'https://www.companyweb.be/fr/';
 export default class CompanyScrapperController extends BaseScrapper {
   baseUrl: string = COMPANY_BASE_URL;
 
-  async getDataFromEnterpriseNumber(companyNumber: string) {
-    const data = await this.fetchAndParse(companyNumber);
+  async getDataFromEnterpriseNumber(enterpriseId: string) {
+    const data = await this.fetchAndParse(enterpriseId);
     return {
-      companyNumber,
+      enterpriseId,
       address: this.getAddress(data),
       creationDate: this.getCreationDate(data),
       mainActivity: this.getMainActivity(data),

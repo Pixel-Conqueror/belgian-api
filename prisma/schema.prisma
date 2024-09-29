@@ -103,3 +103,29 @@ model Establishment {
 
   @@index([enterpriseNumber])
 }
+
+model ScrappedData {
+  id             String @id @default(auto()) @map("_id") @db.ObjectId
+  enterpriseId   String @unique @map("EnterpriseId")
+  address        String @map("Address")
+  creationDate   String @map("CreationDate")
+  mainActivity   String @map("MainActivity")
+  legalStatus    String @map("LegalStatus")
+  legalForm      String @map("LegalForm")
+  legalSituation String @map("LegalSituation")
+  startDate      String @map("StartDate")
+  companyName    String @map("CompanyName")
+  phoneNumber    String @map("PhoneNumber")
+
+  wishlistIDs String[]   @map("WishlistIDs") @db.ObjectId
+  wishlists   Wishlist[] @relation(fields: [wishlistIDs], references: [id])
+}
+
+model Wishlist {
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String @map("UserId")
+  enterpriseId String @map("EnterpriseId")
+
+  scrappedDataIDs String[]       @map("ScraperDataIDs") @db.ObjectId
+  scrappedDatas   ScrappedData[] @relation(fields: [scrappedDataIDs], references: [id])
+}
