@@ -5,7 +5,7 @@ export default class EnterpriseController {
   /**
    * @index
    * @description Get paginated enterprises dataset
-   * @params cursor - cursor for pagination
+   * @paramPath cursor - cursor for pagination
    * @responseBody 200 - <Enterprise>
    * @responseHeader 200
    */

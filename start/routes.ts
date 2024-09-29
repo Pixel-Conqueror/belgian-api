@@ -5,6 +5,7 @@ import router from '@adonisjs/core/services/router';
 import '#routes/auth';
 import '#routes/enterprise';
 import '#routes/scrapper';
+import '#routes/search';
 import '#routes/swagger';
 import '#routes/upload_csv';
 import '#routes/welcome';
