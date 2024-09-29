@@ -1,6 +1,6 @@
 import vine, { SimpleMessagesProvider } from '@vinejs/vine';
 
-export const scrappingValidator = vine.compile(
+export const wishlistValidator = vine.compile(
   vine.object({
     params: vine.object({
       enterpriseId: vine
@@ -11,7 +11,7 @@ export const scrappingValidator = vine.compile(
   })
 );
 
-scrappingValidator.messagesProvider = new SimpleMessagesProvider({
+wishlistValidator.messagesProvider = new SimpleMessagesProvider({
   'companyNum.required': 'Enterprise ID is required.',
   'companyNum.regex': 'Enterprise ID must be a number with at least 6 digits.',
 });

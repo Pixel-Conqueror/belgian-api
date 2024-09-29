@@ -1,7 +1,7 @@
 import * as cheerio from 'cheerio';
 
 export type ScrapperResult = Record<string, string | undefined>;
-export type CompanyNumber = string;
+export type EnterpriseId = string;
 
 const USER_AGENT =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3';
@@ -10,8 +10,8 @@ export default abstract class BaseScrapper {
   private userAgent: string = USER_AGENT;
   abstract baseUrl: string;
 
-  async fetchAndParse(companyNumber: CompanyNumber) {
-    const request = await fetch(this.buildUrl(companyNumber), {
+  async fetchAndParse(enterpriseId: EnterpriseId) {
+    const request = await fetch(this.buildUrl(enterpriseId), {
       method: 'GET',
       headers: {
         'User-Agent': this.userAgent,
@@ -38,10 +38,10 @@ export default abstract class BaseScrapper {
   }
 
   abstract getDataFromEnterpriseNumber(
-    companyNumber: CompanyNumber
+    enterpriseId: EnterpriseId
   ): Promise<ScrapperResult>;
 
-  private buildUrl(companyNumber: CompanyNumber) {
-    return `${this.baseUrl}${companyNumber}`;
+  private buildUrl(enterpriseId: EnterpriseId) {
+    return `${this.baseUrl}${enterpriseId}`;
   }
 }

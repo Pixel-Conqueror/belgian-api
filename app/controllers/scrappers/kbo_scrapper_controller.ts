@@ -7,10 +7,10 @@ const KBO_BASE_URL =
 export default class KboScrapperController extends BaseScrapper {
   baseUrl: string = KBO_BASE_URL;
 
-  async getDataFromEnterpriseNumber(companyNumber: string) {
-    const data = await this.fetchAndParse(companyNumber);
+  async getDataFromEnterpriseNumber(enterpriseId: string) {
+    const data = await this.fetchAndParse(enterpriseId);
     return {
-      companyNumber,
+      enterpriseId,
       legalStatus: this.getLegalStatus(data),
       legalSituation: this.getLegalSituation(data),
       startDate: this.getStartDate(data),

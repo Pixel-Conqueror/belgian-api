@@ -9,6 +9,7 @@ import '#routes/search';
 import '#routes/swagger';
 import '#routes/upload_csv';
 import '#routes/welcome';
+import '#routes/wishlist';
 
 const UserController = () => import('#controllers/user_controller');
 
