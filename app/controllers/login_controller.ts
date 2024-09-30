@@ -6,7 +6,7 @@ export default class LoginController {
   /**
    * @handle
    * @description Authenticate user
-   * @requestBody {"email": "johndoe@example.com", "password": "my_strong_password"}
+   * @requestBody {"email": "johndoe@example.com", "password": "Aaaaaaaaa"}
    * @responseBody 200 - <User>
    * @responseHeader 200
    */

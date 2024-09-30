@@ -7,6 +7,7 @@ export const loginValidator = vine.compile(
       .string()
       .email()
       .trim()
+      .toLowerCase()
       .use(shouldExistRule({ table: 'users', column: 'email' })),
     password: vine.string().trim(),
   })
