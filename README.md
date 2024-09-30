@@ -1,6 +1,6 @@
 ## Belgian API
 
-[!IMPORTANT] You must copy the .env.example as .env in order to start the project
+[!NOTE] You must copy the .env.example as .env in order to start the project
 
 ### Install deps
 
