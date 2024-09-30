@@ -6,7 +6,7 @@ export default class SigninsController {
   /**
    * @handle
    * @description Create a new user account
-   * @requestBody {"firstname": "John", "lastname": "Doe", "email": "johndoe@example.com", "password": "my_strong_password"}
+   * @requestBody {"firstname": "John", "lastname": "Doe", "email": "johndoe@example.com", "password": "Aaaaaaaaa"}
    * @responseBody 200 - <User>
    * @responseHeader 200
    */

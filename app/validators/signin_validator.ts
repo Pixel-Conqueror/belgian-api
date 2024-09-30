@@ -9,6 +9,7 @@ export const signinValidator = vine.compile(
       .string()
       .email()
       .trim()
+      .toLowerCase()
       .use(uniqueRule({ table: 'users', column: 'email' })),
     password: vine.string().trim(),
   })
