@@ -11,7 +11,8 @@ export default abstract class BaseScrapperService {
   abstract baseUrl: string;
 
   async fetchAndParse(enterpriseId: EnterpriseId) {
-    const request = await fetch(this.buildUrl(enterpriseId), {
+    const url = this.buildUrl(enterpriseId);
+    const request = await fetch(url, {
       method: 'GET',
       headers: {
         'User-Agent': this.userAgent,
@@ -19,7 +20,8 @@ export default abstract class BaseScrapperService {
     });
 
     if (!request.ok) {
-      throw new Error('Failed to fetch data');
+      console.log('Failed to fetch data', request.statusText, url);
+      throw new Error('Failed to fetch data', { cause: request.statusText });
     }
 
     return cheerio.load(await request.text());
@@ -42,6 +44,7 @@ export default abstract class BaseScrapperService {
   ): Promise<ScrapperResult>;
 
   private buildUrl(enterpriseId: EnterpriseId) {
-    return `${this.baseUrl}${enterpriseId}`;
+    const enterpriseIdFinal = enterpriseId.replaceAll('.', '');
+    return `${this.baseUrl}${enterpriseIdFinal}`;
   }
 }

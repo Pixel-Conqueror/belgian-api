@@ -18,8 +18,8 @@ export default class WishlistsController {
    * @responseHeader 200
    */
   async index({ auth }: HttpContext) {
-    const wishlists = await this.findWishlistsByUserId(auth.user!.id);
-    return wishlists;
+    const wishlist = await this.findWishlistsByUserId(auth.user!.id);
+    return { wishlist };
   }
 
   /**
@@ -35,13 +35,16 @@ export default class WishlistsController {
     } = await request.validateUsing(wishlistValidator);
     const userId = auth.user!.id.toString();
 
-    const wishlist = await this.createWishlist(userId, enterpriseId);
-    const scrappedData =
-      await this.scrapperController.getEnterpriseData(enterpriseId);
+    await this.createWishlist(userId, enterpriseId);
+    await this.scrapperController.getEnterpriseData(enterpriseId);
+    const wishlist = await this.findWishlistByEnterpriseId(
+      enterpriseId,
+      userId
+    );
 
     return {
-      scrappedData,
       wishlist,
+      message: 'Wishlist created successfully.',
     };
   }
 
@@ -69,11 +72,45 @@ export default class WishlistsController {
     return scrappedData;
   }
 
+  /**
+   * @delete
+   * @description Delete a wishlist
+   * @paramPath enterpriseId - Enterprise ID
+   * @responseBody 200 - <Wishlist[]>
+   * @responseHeader 200
+   */
+  async delete({ request, auth }: HttpContext) {
+    const {
+      params: { enterpriseId },
+    } = await request.validateUsing(wishlistValidator);
+    const userId = auth.user!.id.toString();
+
+    const wishlist = await this.findWishlistByEnterpriseId(
+      enterpriseId,
+      userId
+    );
+    if (wishlist.length === 0) {
+      throw new Error('Wishlist not found.');
+    }
+
+    await db.wishlist.delete({
+      where: {
+        userId,
+        id: wishlist[0].id,
+      },
+    });
+
+    return {
+      message: 'Wishlist deleted successfully.',
+    };
+  }
+
   private async createWishlist(userId: UserId, enterpriseId: string) {
     const existingWishlist = await this.findWishlistByEnterpriseId(
       enterpriseId,
       userId
     );
+    console.log('existingWishlist', existingWishlist);
     if (existingWishlist.length > 0) {
       throw new Error('This enterprise is already in your wishlist.');
     }
@@ -91,6 +128,9 @@ export default class WishlistsController {
       where: {
         userId: userId.toString(),
       },
+      include: {
+        scrappedData: true,
+      },
     });
   }
 
@@ -99,6 +139,9 @@ export default class WishlistsController {
       where: {
         enterpriseId,
         userId: userId.toString(),
+      },
+      include: {
+        scrappedData: true,
       },
     });
   }
