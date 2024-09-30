@@ -90,6 +90,7 @@ model Enterprise {
   contacts       Contact[]
   denominations  Denomination[]
   establishments Establishment[]
+  Wishlist       Wishlist[]
 }
 
 model Establishment {
@@ -117,8 +118,7 @@ model ScrappedData {
   companyName    String @map("CompanyName")
   phoneNumber    String @map("PhoneNumber")
 
-  wishlistIDs String[]   @map("WishlistIDs") @db.ObjectId
-  wishlists   Wishlist[] @relation(fields: [wishlistIDs], references: [id])
+  wishlists Wishlist[]
 }
 
 model Wishlist {
@@ -126,6 +126,7 @@ model Wishlist {
   userId       String @map("UserId")
   enterpriseId String @map("EnterpriseId")
 
-  scrappedDataIDs String[]       @map("ScraperDataIDs") @db.ObjectId
-  scrappedDatas   ScrappedData[] @relation(fields: [scrappedDataIDs], references: [id])
+  // Relation many-to-one: chaque Wishlist est lié à un seul ScrappedData via enterpriseId
+  scrappedData ScrappedData @relation(fields: [enterpriseId], references: [enterpriseId])
+  Enterprise   Enterprise   @relation(fields: [enterpriseId], references: [id])
 }

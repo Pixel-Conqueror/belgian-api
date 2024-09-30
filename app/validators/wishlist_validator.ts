@@ -3,10 +3,7 @@ import vine, { SimpleMessagesProvider } from '@vinejs/vine';
 export const wishlistValidator = vine.compile(
   vine.object({
     params: vine.object({
-      enterpriseId: vine
-        .string()
-        .regex(/^\d{6,}$/)
-        .trim(),
+      enterpriseId: vine.string().trim(),
     }),
   })
 );
