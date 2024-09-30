@@ -8,6 +8,7 @@ router
   .group(() => {
     router.get('/wishlists', [WishlistsController, 'index']);
     router.post('/wishlist/:enterpriseId', [WishlistsController, 'store']);
+    router.delete('/wishlist/:enterpriseId', [WishlistsController, 'delete']);
     router.get('/wishlist/:enterpriseId', [WishlistsController, 'show']);
   })
   .prefix(API_PREFIX_V1)
